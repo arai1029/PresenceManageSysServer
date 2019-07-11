@@ -22,11 +22,12 @@
 requestなどのmoduleは適宜追加すること
 
 # POSTでやりとりするデータ
->json:
+
+``` json:example
 {
     "area":1,
     "seat":[0,1,1,1]
 }
-
+```
 areaには1~4の整数値を入れる
 seatは離席時に0,在籍時に1
