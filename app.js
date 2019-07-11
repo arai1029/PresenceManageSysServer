@@ -1,5 +1,3 @@
-
-
 var createError = require('http-errors');
 var express = require('express');
 const bodyParser = require('body-parser');
@@ -13,11 +11,8 @@ var http= require('https');
 require('date-utils');
 var dateFormat = require('dateformat');
 
-
-
 //client
 var WebSocketServer = require('ws').Server
-
 
 var wss = new WebSocketServer({
     port : 8443,
@@ -25,31 +20,28 @@ var wss = new WebSocketServer({
 });
 
 var app = express()
-
 module.exports = app;
-
-
 console.log("websocket server created")
 
+var stocks = {
+  "1": 0,
+  "2": 0,
+  "3": 0,
+  "4": 0,
+  "5": 0,
+  "6": 0,
+  "7": 0,
+  "8": 0,
+  "9": 0,
+  "10": 0,
+  "11": 0,
+  "12": 0,
+  "13": 0,
+  "14": 0,
+  "15": 0,
+  "16": 0
+}
 
-var stocks = {"1": 0,
-              "2": 0,
-              "3": 0,
-              "4": 0,
-              "5": 0,
-              "6": 0,
-              "7": 0,
-              "8": 0,
-              "9": 0,
-              "10": 0,
-              "11": 0,
-              "12": 0,
-              "13": 0,
-              "14": 0,
-              "15": 0,
-              "16": 0
-      }
-    
 var seat_list = [ 
     {seatID:1,state:0,date:null},
     {seatID:2,state:0,date:null},
@@ -68,22 +60,7 @@ var seat_list = [
     {seatID:15,state:0,date:null},
     {seatID:16,state:0,date:null}]
 
-var timer1 = null;
-var timer2 = null;
-var timer3 = null;
-var timer4 = null;
-var timer5 = null;
-var timer6 = null;
-var timer7 = null;
-var timer8 = null;
-var timer9 = null;
-var timer10 = null;
-var timer11 = null;
-var timer12 = null;
-var timer13 = null;
-var timer14 = null;
-var timer15 = null;
-var timer16 = null;
+var loopcount=0;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -126,49 +103,20 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-
 app.get('/seatUpdate', function(req, res){
     console.log(stocks);
     //res.send(stocks);
     res.writeHead(200, {"Content-Type": "application/json"});
     res.end(JSON.stringify({"stocks":stocks}));
-  
-  });
+});
 
+// post処理
 app.post('/', function(req, res) {
     // リクエストボディを出力
     console.log(req.body);
-    
     // パラメータ名、nameを出力
     res.set('Content-Type', 'application/json');
-    
-     
-    // if(req.body.area == 0){
-    //     clearTimeout(timer1);
-    //     console.log("1番席在席")
-    //     if(seat_list[0].state == 0){
-    //         seat_list[0].state = 1
-    //         seat_list[0].date = dateFormat(Date());
-    //         //exportCSV(seat_list[0]);
-    //         stocks["1"] = 1
-        
-    //     }
-    //     //離席処理
-    //     timer1 = setTimeout(function () { 
-    //         seat_list[0].state = 0
-    //         seat_list[0].date = dateFormat(Date());
-    //         stocks["1"] =0
-    //         //exportCSV(seat_list[0]);
-    //         //ログ処理
-    //         console.log("１番席離席しました")
-    //     },30000);
-    // }
-
-    console.log("set Attendnace")
-    // console.log("req.body.area",req.body.area);
-    // console.log("req.body.seat1",req.body.seat1);
-    // console.log("req.body.seat2",req.body.seat2);
-    console.log((parseInt(req.body.area)-1)*4+1);
+    // console.log("set Attendnace")
     // areaは1~4の値が入る
     // areaによってseat_listのどこに値が入るかを決める
     for(let i=0;i<4;i++){
@@ -177,21 +125,41 @@ app.post('/', function(req, res) {
         stocks[(req.body.area-1)*4+i+1] = parseInt(req.body.seat[i]);
     }
     
-    // seat_list[(parseInt(req.body.area)-1)*4+1].state = req.body.seat2;
-    // stocks[(req.body.area-1)*4+2] = parseInt(req.body.seat2);
-    
-    console.log(seat_list[0])
-
+    // postするjson用に成型
+    var seat = [];
+    for(let i=0;i<seat_list.length;i++){
+      seat[i]=seat_list[i].state;
+    }
+    console.log("seat",seat);
+    var data = {
+      "area":req.body.area,
+      "seat":seat
+    }
+    // console.log("data",data);
+    loopcount=loopcount+1;
+    if(loopcount==10){
+      // console.log("post!");
+      post(data);
+      loopcount=0;
+    }
     res.send('POST request to the homepage');
 })
 
-function originIsAllowed(origin) {
-  // put logic here to detect whether the specified origin is allowed.
-  return true;
+function post(data){
+  // console.log("in func post")
+  var url = 'https://script.google.com/macros/s/AKfycbx8_SWscJoYEgZ5DHbNXeQU4ouKZikVql9foaQSqClnhxHQIaHC/exec';
+  var webclient = require("request");
+  webclient.post({
+    url: url,
+    headers: {
+      "content-type": "application/json"
+    },
+    body:JSON.stringify(data)
+  },function (error, response, body){
+    // console.log("body",body);
+    // console.log("error",error);
+  });
 }
-
-
-
 
 // jsonをcsvで保存するfunction
 function exportCSV(content){
@@ -212,5 +180,4 @@ function exportCSV(content){
           console.log('保存できました');
         }
       });
-    }
-
+}
