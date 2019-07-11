@@ -17,11 +17,23 @@
     - Chromeで動作確認
 
 # 起動法
+terminalでapp.jsのあるディレクトリを開いて
 >npm start
 
 requestなどのmoduleは適宜追加すること
 
-# POSTでやりとりするデータ
+# POST
+## データの流れ
+- Liderから在離席情報が送られてくる
+- serverで複数台の情報を統合する
+- SpreadSheetへ全体の情報を送信する 
+
+## SpreadSheetへの送信頻度
+app.jsの"loopmax"という変数を用いて更新している．\
+これでLider側からのpostの回数に応じてSpreadSheetへPOSTしている．
+
+## データの形式
+Lider側からの受取もSpreadSheetへの送信も同じformatで
 
 ``` json:example
 {

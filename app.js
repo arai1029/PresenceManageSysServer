@@ -1,3 +1,6 @@
+var loopcount=0;
+var loopmax=10;
+
 var createError = require('http-errors');
 var express = require('express');
 const bodyParser = require('body-parser');
@@ -60,7 +63,7 @@ var seat_list = [
     {seatID:15,state:0,date:null},
     {seatID:16,state:0,date:null}]
 
-var loopcount=0;
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -137,7 +140,7 @@ app.post('/', function(req, res) {
     }
     // console.log("data",data);
     loopcount=loopcount+1;
-    if(loopcount==10){
+    if(loopcount==loopmax){
       // console.log("post!");
       post(data);
       loopcount=0;
